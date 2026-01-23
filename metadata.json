@@ -1,0 +1,5 @@
+{
+  "name": "niko-ai-app",
+  "description": "Gemini 3 Pro 기반의 니코입니다. 이미지 인식과 노션 동기화를 제공합니다.",
+  "requestFramePermissions": ["camera"]
+}
