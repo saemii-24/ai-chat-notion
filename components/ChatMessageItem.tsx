@@ -7,6 +7,48 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ChatMessage, Role } from '../types';
 import { ExternalLink, Copy, Check } from 'lucide-react';
 
+// Transform an imported theme-style object by replacing color hex strings with
+// CSS variables so the inline styles produced by SyntaxHighlighter follow
+// the document-level `.dark` class defined in globals.css. This keeps the
+// token/background colors under our theme control without modifying the
+// third-party theme object source.
+function transformThemeToCssVars(styleObj: any) {
+  const isHex = (v: string) => /^#([0-9a-f]{3,8})$/i.test(v);
+
+  function walk(obj: any): any {
+    if (!obj || typeof obj !== 'object') return obj;
+    const out: any = Array.isArray(obj) ? [] : {};
+    for (const key of Object.keys(obj)) {
+      const val = obj[key];
+      if (typeof val === 'string') {
+        if (isHex(val.trim())) {
+          // Map background-like properties to --code-bg, color to --code-fg,
+          // otherwise default to the foreground variable so tokens inherit
+          // a theme-aware color.
+          const lname = key.toLowerCase();
+          if (lname.includes('background') || lname.includes('bg')) out[key] = 'var(--code-bg)';
+          else if (lname === 'color' || lname.includes('foreground')) out[key] = 'var(--code-fg)';
+          else out[key] = 'var(--code-fg)';
+        } else {
+          out[key] = val;
+        }
+      } else if (typeof val === 'object') {
+        out[key] = walk(val);
+      } else {
+        out[key] = val;
+      }
+    }
+    return out;
+  }
+
+  return walk(styleObj);
+}
+
+// Build transformedStyle at module load so it's cheap at render-time. The
+// result uses CSS variables (defined in globals.css) and will respond to
+// theme toggles that add/remove the `.dark` class on <html>.
+const transformedStyle = transformThemeToCssVars(vscDarkPlus as any);
+
 interface ChatMessageItemProps {
   message: ChatMessage;
 }
@@ -71,7 +113,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
                                 </button>
                               </div>
                               <SyntaxHighlighter
-                                style={vscDarkPlus}
+                                style={transformedStyle}
                                 language={match[1]}
                                 PreTag="div"
                                 className="!bg-slate-950 !rounded-xl !border !border-slate-800 !p-4 !m-0"
@@ -110,3 +152,4 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
 };
 
 export default ChatMessageItem;
+

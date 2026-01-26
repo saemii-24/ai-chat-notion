@@ -1,12 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 body {
-  font-family: var(--font-inter), "Inter", sans-serif;
+  font-family: var(--font-noto-sans-kr), "Noto_Sans_KR", sans-serif;
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+/* Smooth theme transition helper
+   When toggling themes we briefly add `theme-transition` on <html> to animate
+   background, color, borders, shadows and SVG fills/strokes across the page. */
+.theme-transition,
+.theme-transition * {
+  transition-property:
+    background-color, color, border-color, box-shadow, fill, stroke;
+  transition-duration: 260ms;
+  transition-timing-function: ease;
+}
+
+.theme-transition {
+  will-change: background-color, color;
 }
 
 ::-webkit-scrollbar {
@@ -39,4 +52,29 @@ body {
 .dark .glass {
   background: rgba(15, 23, 42, 0.8);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Syntax highlighter CSS variables - used by the inlined style object we build
+   in ChatMessageItem so code blocks transition with the document-level .dark class. */
+:root {
+  --code-bg: #ffffff;
+  --code-fg: #0b0b0b;
+  --code-border: rgba(15, 23, 42, 0.06);
+  --code-comment: #545454;
+  --code-keyword: #a51850;
+  --code-string: #036157;
+}
+
+.dark {
+  --code-bg: #0b1220; /* deep/dark background for code blocks */
+  --code-fg: #e6eef8;
+  --code-border: rgba(255, 255, 255, 0.03);
+  --code-comment: #9aa6b2;
+  --code-keyword: #f58ea2;
+  --code-string: #4fd1c5;
+}
+
+/* make sure pre/code containers smoothly transition with theme */
+pre[class*="language-"], code[class*="language-"] {
+  transition: background-color 260ms ease, color 260ms ease, border-color 260ms ease;
 }

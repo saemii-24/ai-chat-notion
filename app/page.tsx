@@ -17,8 +17,6 @@ import {
   Loader2,
   Share2,
   Shield,
-  Settings,
-  ExternalLink,
   Sun,
   Moon,
 } from "lucide-react";
@@ -64,12 +62,24 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // Add a short-lived helper class so the CSS transition rules can animate
+    // common visual properties (background, color, borders, shadows, svg fills)
+    const el = document.documentElement;
+    el.classList.add("theme-transition");
+
     if (theme === "dark") {
-      document.documentElement.classList.add("dark");
+      el.classList.add("dark");
     } else {
-      document.documentElement.classList.remove("dark");
+      el.classList.remove("dark");
     }
+
     localStorage.setItem("niko-theme", theme);
+
+    const t = window.setTimeout(() => {
+      el.classList.remove("theme-transition");
+    }, 300);
+
+    return () => window.clearTimeout(t);
   }, [theme]);
 
   const toggleTheme = () =>
@@ -114,67 +124,11 @@ export default function Home() {
     localStorage.setItem("niko-notion-config-v1", JSON.stringify(notionConfig));
   }, [notionConfig]);
 
-  if (!isFirebaseConfigured) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-6">
-        <div className="max-w-xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 md:p-12 shadow-2xl transition-colors duration-300">
-          <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center border border-amber-500/20">
-              <Settings className="text-amber-500 w-8 h-8" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">
-            Firebase 설정이 필요합니다
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-center text-sm mb-8 leading-relaxed">
-            클라우드 동기화 기능을 사용하려면 본인의 Firebase 프로젝트 설정값이
-            필요합니다. 3분이면 무료로 만들 수 있습니다!
-          </p>
-
-          <div className="space-y-4 mb-10">
-            <div className="flex gap-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-              <div className="bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
-                1
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300">
-                Firebase 콘솔에서 새 프로젝트를 생성하세요.
-              </p>
-            </div>
-            <div className="flex gap-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
-              <div className="bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
-                2
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300">
-                웹 앱을 추가하고 발급된 <code>firebaseConfig</code>를
-                복사하세요.
-              </p>
-            </div>
-          </div>
-
-          <a
-            href="https://console.firebase.google.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-indigo-600/20"
-          >
-            Firebase 콘솔로 이동
-            <ExternalLink size={18} />
-          </a>
-        </div>
-      </div>
+  const handleLogin = (email: string, provider?: "google" | "email") => {
+    showToast(
+      `${provider === "google" ? "구글" : "이메일"} 계정으로 로그인되었습니다.`,
+      "success",
     );
-  }
-
-  const handleLogin = async (email: string) => {
-    try {
-      await CloudDBService.login(email, "defaultPassword123!");
-      showToast(
-        `${email.includes("kakao") ? "카카오" : "이메일"} 계정으로 로그인되었습니다.`,
-        "success",
-      );
-    } catch (err) {
-      showToast("로그인 실패: 자격 증명을 확인해주세요.");
-    }
   };
 
   const handleLogout = async () => {
@@ -257,6 +211,9 @@ export default function Home() {
         updatedSession.messages,
         imageData,
       );
+
+      console.log(stream);
+
       let fullResponseText = "";
 
       for await (const chunk of stream) {
@@ -297,7 +254,7 @@ export default function Home() {
       <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 gap-4">
         <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
         <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
-          Initializing session...
+          로그인을 확인하고 있습니다...
         </p>
       </div>
     );
@@ -313,7 +270,7 @@ export default function Home() {
     <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-900 dark:text-slate-100 transition-colors duration-300">
       {toast && (
         <div
-          className={`fixed top-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
+          className={`fixed top-8 left-1/2 -translate-x-1/2 z-300 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
             toast.type === "success"
               ? "bg-emerald-600 text-white"
               : "bg-slate-900 text-white"
@@ -364,7 +321,7 @@ export default function Home() {
               <Menu size={20} />
             </button>
             <div className="flex flex-col">
-              <h2 className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[150px] md:max-w-md">
+              <h2 className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-37.5 md:max-w-md">
                 {activeSession?.messages.length === 0
                   ? "새로운 대화"
                   : activeSession?.title}
@@ -407,15 +364,15 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             {activeSession?.messages.length === 0 && (
               <div className="h-[60vh] flex flex-col items-center justify-center text-center px-6">
-                <div className="w-16 h-16 bg-indigo-600/10 rounded-[2rem] flex items-center justify-center mb-8 border border-indigo-500/20 shadow-2xl">
+                <div className="w-16 h-16 bg-indigo-600/10 rounded-4xl flex items-center justify-center mb-8 border border-indigo-500/20 shadow-2xl">
                   <Share2 className="w-8 h-8 text-indigo-600" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white tracking-tight">
                   어떤 도움을 드릴까요?
                 </h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm text-sm leading-relaxed">
-                  니코(Niko)는 당신의 학습을 돕기 위해 설계된 AI 비서입니다.
-                  이미지 분석부터 노션 동기화까지 모든 것이 가능합니다.
+                  니코(Niko)는 여러분의 영어 학습을 돕기 위해 설계된 AI 입니다.
+                  사진 문제 풀이 부터 노션 필기까지 모든 것이 가능합니다.
                 </p>
               </div>
             )}
