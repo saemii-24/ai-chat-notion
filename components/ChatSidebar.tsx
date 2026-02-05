@@ -1,9 +1,14 @@
-
-import React from 'react';
-import { ChatSession, NotionConfig } from '../types';
-import NotionSettings from './NotionSettings';
-import { Plus, MessageSquare, Trash2, LogOut, User as UserIcon, Sun, Moon } from 'lucide-react';
-import { User } from '../services/dbService';
+import React from "react";
+import { ChatSession, NotionConfig } from "../types";
+import NotionSettings from "./NotionSettings";
+import {
+  Plus,
+  MessageSquare,
+  Trash2,
+  LogOut,
+  User as UserIcon,
+} from "lucide-react";
+import { User } from "../services/dbService";
 
 interface ChatSidebarProps {
   user: User;
@@ -16,7 +21,7 @@ interface ChatSidebarProps {
   onUpdateNotion: (config: NotionConfig) => void;
   onLogout: () => void;
   onClose?: () => void;
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   onToggleTheme: () => void;
 }
 
@@ -36,11 +41,11 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
 }) => {
   return (
     <>
-      <div 
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[40] md:hidden"
         onClick={onClose}
       />
-      
+
       <div className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col z-[50] md:relative md:z-0 animate-in slide-in-from-left duration-300 transition-colors duration-300">
         {/* User Profile */}
         <div className="p-6 border-b border-slate-200 dark:border-slate-900 bg-slate-50 dark:bg-slate-900/20">
@@ -49,11 +54,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
               <UserIcon size={20} />
             </div>
             <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-bold text-slate-900 dark:text-white truncate">{user.name}</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-500 truncate">{user.email}</span>
+              <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                {user.name}
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-500 truncate">
+                {user.email}
+              </span>
             </div>
           </div>
-          <button 
+          <button
             onClick={onLogout}
             className="w-full flex items-center justify-center gap-2 py-2 text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/5 rounded-lg border border-slate-200 dark:border-slate-800 transition-all uppercase tracking-widest"
           >
@@ -70,8 +79,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
             }}
             className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center gap-2 transition-all font-semibold text-sm shadow-lg shadow-indigo-600/20 active:scale-[0.98]"
           >
-            <Plus size={18} />
-            새 대화 시작하기
+            <Plus size={18} />새 대화 시작하기
           </button>
         </div>
 
@@ -88,12 +96,21 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
               }}
               className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
                 activeSessionId === session.id
-                  ? 'bg-indigo-50 dark:bg-slate-900 text-indigo-700 dark:text-slate-100'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900/50 hover:text-slate-800 dark:hover:text-slate-300'
+                  ? "bg-indigo-50 dark:bg-slate-900 text-indigo-700 dark:text-slate-100"
+                  : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900/50 hover:text-slate-800 dark:hover:text-slate-300"
               }`}
             >
-              <MessageSquare size={16} className={activeSessionId === session.id ? 'text-indigo-600 dark:text-indigo-400' : ''} />
-              <span className="truncate text-sm font-medium flex-1">{session.title}</span>
+              <MessageSquare
+                size={16}
+                className={
+                  activeSessionId === session.id
+                    ? "text-indigo-600 dark:text-indigo-400"
+                    : ""
+                }
+              />
+              <span className="truncate text-sm font-medium flex-1">
+                {session.title}
+              </span>
               <button
                 onClick={(e) => {
                   e.stopPropagation();

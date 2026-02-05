@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Fira_Code } from "next/font/google";
+import { Noto_Sans_KR, Fira_Code } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const firaCode = Fira_Code({
-  subsets: ["latin"],
-  variable: "--font-fira-code",
+  variable: "--font-noto-sans-kr",
   display: "swap",
 });
 
@@ -27,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${firaCode.variable} bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300`}
+        className={`${notoSansKr.variable} bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300`}
       >
         {children}
       </body>
