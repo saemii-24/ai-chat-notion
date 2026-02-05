@@ -6,11 +6,6 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ChatMessage, Role } from "../types";
 import { ExternalLink, Copy, Check } from "lucide-react";
 
-// Transform an imported theme-style object by replacing color hex strings with
-// CSS variables so the inline styles produced by SyntaxHighlighter follow
-// the document-level `.dark` class defined in globals.css. This keeps the
-// token/background colors under our theme control without modifying the
-// third-party theme object source.
 function transformThemeToCssVars(styleObj: any) {
   const isHex = (v: string) => /^#([0-9a-f]{3,8})$/i.test(v);
 
@@ -45,9 +40,6 @@ function transformThemeToCssVars(styleObj: any) {
   return walk(styleObj);
 }
 
-// Build transformedStyle at module load so it's cheap at render-time. The
-// result uses CSS variables (defined in globals.css) and will respond to
-// theme toggles that add/remove the `.dark` class on <html>.
 const transformedStyle = transformThemeToCssVars(vscDarkPlus as any);
 
 interface ChatMessageItemProps {
